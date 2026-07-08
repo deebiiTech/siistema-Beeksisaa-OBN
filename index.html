@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBN Ad Transmission Management System</title>
+    <title>OBN Ad Transmission & Performance System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -17,7 +17,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: var(--obn-gray); color: var(--obn-black); display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* ----- OFFICIAL HEADER ----- */
         header {
             background-color: var(--obn-red); color: var(--obn-white); padding: 15px 40px;
             display: flex; justify-content: space-between; align-items: center;
@@ -35,26 +34,11 @@
         .header-title h1 { font-size: 22px; font-weight: 800; text-transform: uppercase; }
         .header-title p { font-size: 12px; color: rgba(255, 255, 255, 0.9); }
         
-        /* Hamburger Icon Mobile-f */
         .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 10px;
-            z-index: 1001;
+            display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 10px; z-index: 1001;
         }
-        .hamburger span {
-            display: block;
-            width: 25px;
-            height: 3px;
-            background-color: var(--obn-white);
-            border-radius: 2px;
-        }
+        .hamburger span { display: block; width: 25px; height: 3px; background-color: var(--obn-white); border-radius: 2px; }
 
-        /* Navigation Links (Desktop) */
         nav { display: flex; gap: 12px; flex-wrap: wrap; }
         nav button {
             background: var(--obn-black); color: var(--obn-white); border: 1px solid var(--obn-white);
@@ -62,16 +46,13 @@
         }
         nav button:hover, nav button.active { background-color: var(--obn-white); color: var(--obn-red); }
 
-        /* ----- MAIN CONTENT ROUTER ----- */
         main { flex: 1; padding: 30px 40px; max-width: 1400px; width: 100%; margin: 0 auto; }
         .page-view { display: none; }
         .page-view.active-view { display: block; }
 
-        /* ----- LOGIN INTERFACE ----- */
         .login-wrapper { max-width: 400px; margin: 80px auto; background: var(--obn-white); padding: 30px; border-radius: 6px; border-top: 5px solid var(--obn-red); box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
         .login-wrapper h2 { margin-bottom: 20px; font-size: 20px; text-transform: uppercase; color: var(--obn-black); }
         
-        /* ----- PANELS ----- */
         .panel { background: var(--obn-white); border-radius: 6px; border-top: 4px solid var(--obn-black); box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 25px; }
         .panel-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid var(--obn-gray); padding-bottom: 10px; text-transform: uppercase; }
         
@@ -80,23 +61,19 @@
         input, select, textarea { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; color: var(--obn-black); }
         input:focus, select:focus { outline: none; border-color: var(--obn-red); }
 
-        /* Buttons */
         .btn { background-color: var(--obn-black); color: var(--obn-white); border: none; padding: 12px 20px; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.2s; }
         .btn:hover { background-color: var(--obn-red); }
         .btn-excel { background-color: #111; width: auto; margin-bottom: 15px; }
         .btn-logout { background-color: #333 !important; }
 
-        /* KPI Cards */
         .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: var(--obn-white); padding: 20px; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid var(--obn-black); }
         .stat-card.red-border { border-bottom-color: var(--obn-red); }
         .stat-card h3 { font-size: 12px; color: #666; text-transform: uppercase; }
         .stat-card .val { font-size: 26px; font-weight: 800; margin-top: 5px; }
 
-        /* Layout Grid */
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
 
-        /* Tables */
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; background: var(--obn-white); }
         th, td { padding: 14px; font-size: 14px; border-bottom: 1px solid var(--border); }
@@ -107,52 +84,39 @@
         .badge.aired { background-color: #e6f4ea; color: #137333; border: 1px solid #137333; }
         .badge.missed { background-color: #fce8e6; color: #c5221f; border: 1px solid #c5221f; }
 
-        /* Calculator Output Panel */
+        /* Progress bar */
+        .progress-container { background-color: #e0e0e0; border-radius: 10px; width: 100%; height: 12px; margin-top: 5px; overflow: hidden; }
+        .progress-bar { background-color: #137333; height: 100%; width: 0%; transition: width 0.3s; }
+        .progress-bar.low { background-color: var(--obn-red); }
+
         .calc-result-box { background-color: var(--obn-black); color: var(--obn-white); padding: 20px; border-radius: 4px; margin-top: 20px; }
         .calc-result-box h3 { border-bottom: 1px dashed #444; padding-bottom: 10px; margin-bottom: 10px; text-transform: uppercase; font-size: 14px; color: #aaa; }
         .calc-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; gap: 10px; }
         .calc-row.total-row { font-size: 20px; font-weight: 800; border-top: 2px solid var(--obn-red); padding-top: 10px; margin-top: 10px; color: var(--obn-white); }
 
-        /* ----- OFFICIAL FOOTER ----- */
         footer { background-color: var(--obn-red); color: var(--obn-white); padding: 25px 40px; border-top: 5px solid var(--obn-black); margin-top: auto; }
         .footer-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .footer-left { display: flex; align-items: center; gap: 15px; }
         .obn-logo-footer { width: 50px; height: 50px; background-color: var(--obn-white); border-radius: 50%; display: flex; justify-content: center; align-items: center; overflow: hidden; flex-shrink: 0; }
         .obn-logo-footer img { width: 100%; height: auto; max-height: 100%; object-fit: contain; }
 
-        /* ==================== RESPONSIVE (MOBILE) ==================== */
         @media (max-width: 768px) {
             header { padding: 15px 20px; }
             .header-title h1 { font-size: 15px; }
             .header-title p { font-size: 10px; }
             .obn-logo-header { width: 45px; height: 45px; }
-
             .hamburger { display: flex; }
-
             nav {
-                display: none; /* Calqaba irratti dhokataadha */
-                flex-direction: column;
-                width: 100%;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                background-color: var(--obn-red);
-                padding: 15px 20px;
-                border-bottom: 4px solid var(--obn-black);
-                z-index: 1000;
-                gap: 8px;
+                display: none; flex-direction: column; width: 100%; position: absolute; top: 100%; left: 0;
+                background-color: var(--obn-red); padding: 15px 20px; border-bottom: 4px solid var(--obn-black); z-index: 1000; gap: 8px;
             }
-            /* Luusni kun yoo itti dabalame qofa mul'ata */
             nav.nav-active { display: flex !important; }
             nav button { width: 100%; text-align: left; padding: 12px; font-size: 12px; }
-
             main { padding: 15px 20px; }
             .stats-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .stat-card { padding: 15px; }
             .stat-card .val { font-size: 18px; }
-
             .grid-container { grid-template-columns: 1fr; gap: 20px; }
-
             footer { padding: 20px; text-align: center; }
             .footer-content { flex-direction: column; gap: 15px; align-items: center; }
             .footer-left { flex-direction: column; text-align: center; }
@@ -163,26 +127,18 @@
 
     <header>
         <div class="header-logo-area">
-            <div class="obn-logo-header">
-                <img src="obn-logo.jfif" alt="OBN Logo"> 
-            </div>
+            <div class="obn-logo-header"><img src="obn-logo.jfif" alt="OBN Logo"></div>
             <div class="header-title">
                 <h1>Oromia Broadcasting Network</h1>
-                <p>Ad Transmission Enterprise Management System</p>
+                <p>Ad Transmission & Sales Performance System</p>
             </div>
         </div>
-        
-        <button class="hamburger" onclick="toggleMenu()" id="menu-toggle-btn">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-
+        <button class="hamburger" onclick="toggleMenu()" id="menu-toggle-btn"><span></span><span></span><span></span></button>
         <nav id="system-nav">
             <button onclick="switchView('dashboard')" id="nav-dashboard">📊 Dashboard</button>
             <button onclick="switchView('admin')" id="nav-admin">🛠️ Admin Panel</button>
+            <button onclick="switchView('performance')" id="nav-performance">🎯 Performance</button>
             <button onclick="switchView('calculator')" id="nav-calculator">🧮 Tilmaama Gatii</button>
-            <button onclick="switchView('about')" id="nav-about">ℹ️ About</button>
             <button onclick="logoutSystem()" class="btn-logout">🚪 Logout</button>
         </nav>
     </header>
@@ -196,41 +152,33 @@
                 </div>
                 <h2>OBN Account Login</h2>
                 <form onsubmit="loginSystem(event)">
-                    <div class="form-group" style="text-align:left;">
-                        <label>Username</label>
-                        <input type="text" id="login-user" value="" required>
-                    </div>
-                    <div class="form-group" style="text-align:left;">
-                        <label>Password</label>
-                        <input type="password" id="login-pass" value="" required>
-                    </div>
+                    <div class="form-group" style="text-align:left;"><label>Username</label><input type="text" id="login-user" required></div>
+                    <div class="form-group" style="text-align:left;"><label>Password</label><input type="password" id="login-pass" required></div>
                     <button type="submit" class="btn" style="margin-top:10px;">🔒 Gena (Login)</button>
                 </form>
-                <p style="font-size:11px; margin-top:15px; color:#666;">Default: admin / admin123</p>
             </div>
-        </div
+        </div>
 
         <div id="view-dashboard" class="page-view">
             <div class="stats-row">
-                <div class="stat-card"><h3 style="color:#111;">Hunda</h3><div class="val" id="kpi-total">0</div></div>
+                <div class="stat-card"><h3>Hunda</h3><div class="val" id="kpi-total">0</div></div>
                 <div class="stat-card" style="border-bottom-color:#137333;"><h3>Tamsaa'an</h3><div class="val" style="color:#137333;" id="kpi-aired">0</div></div>
                 <div class="stat-card red-border"><h3>Citan</h3><div class="val" style="color:var(--obn-red);" id="kpi-missed">0</div></div>
-                <div class="stat-card"><h3>Galii</h3><div class="val" id="kpi-revenue">ETB 0</div></div>
+                <div class="stat-card"><h3>Gali Hunda</h3><div class="val" id="kpi-revenue">ETB 0</div></div>
             </div>
 
             <div class="panel">
                 <h2 class="panel-title">Tarreeffama Hordoffii Beeksisaa</h2>
-                <div style="margin-bottom: 15px;">
-                    <button class="btn btn-excel" onclick="exportToExcel()">📊 Gara Excel tti Download Godhi</button>
-                </div>
+                <button class="btn btn-excel" onclick="exportToExcel()">📊 Gara Excel tti Download Godhi</button>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>Ad ID</th>
                                 <th>Maamiila</th>
+                                <th>Hojjetaa (Sales Specialist)</th>
                                 <th>Sa'aatii</th>
-                                <th>Kaffaltii</th>
+                                <th>Kaffaltii (Gross)</th>
                                 <th>Haala</th>
                             </tr>
                         </thead>
@@ -241,8 +189,37 @@
         </div>
 
         <div id="view-admin" class="page-view">
-            <div class="panel">
-                <h2 class="panel-title">Simannaa Haaraa Galmeessuu</h2>
+            <div class="grid-container">
+                <div class="panel">
+                    <h2 class="panel-title">👤 Hojjetaa & Target Galmeessuu</h2>
+                    <form id="admin-specialist-form" onsubmit="processSpecialistForm(event)">
+                        <div class="form-group">
+                            <label>Maqaa Guutuu (Sales Specialist)</label>
+                            <input type="text" id="spec-name" placeholder="Fkn, Qajeelaa Hambisaa" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Target Kaffaltii (ETB Target)</label>
+                            <input type="number" id="spec-target" placeholder="Fkn, 500000" required>
+                        </div>
+                        <button type="submit" class="btn">➕ Hojjetaa Galmeessi</button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <h2 class="panel-title">📋 Tarree Hojjettoota Galmaanaanii</h2>
+                    <div class="table-responsive" style="max-height: 250px;">
+                        <table>
+                            <thead>
+                                <tr><th>Maqaa</th><th>Target (ETB)</th></tr>
+                            </thead>
+                            <tbody id="admin-staff-table-rows"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-top: 10px;">
+                <h2 class="panel-title">📺 Simannaa Haaraa Galmeessuu</h2>
                 <form id="admin-entry-form" onsubmit="processForm(event)">
                     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px; margin-bottom:20px;">
                         <div class="form-group">
@@ -254,11 +231,17 @@
                             <input type="text" id="client-name" placeholder="Fkn, Awash Bank" required>
                         </div>
                         <div class="form-group">
+                            <label>Hojjetaa Giddu-galeessa Ta'e</label>
+                            <select id="ad-specialist-select" required>
+                                <option value="">-- Hojjetaa Filadhu --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>Sa'aatii Tamsaasaa</label>
                             <input type="text" id="air-time" placeholder="Fkn, 01:00 PM Oduu Booda" required>
                         </div>
                         <div class="form-group">
-                            <label>Kaffaltii Beeksisaa (ETB)</label>
+                            <label>Kaffaltii Beeksisaa (ETB - SubTotal/Gross)</label>
                             <input type="number" id="ad-value" placeholder="Fkn, 65000" required>
                         </div>
                         <div class="form-group">
@@ -271,9 +254,29 @@
                     </div>
                     <div style="display:flex; gap:15px; flex-wrap: wrap;">
                         <button type="submit" class="btn" style="width:auto; padding:12px 35px;">💾 Galmeessi</button>
-                        <button type="button" class="btn" style="width:auto; background:#333;" onclick="clearSystemData()">🗑️ Data Haqi</button>
+                        <button type="button" class="btn" style="width:auto; background:#333;" onclick="clearSystemData()">🗑️ Data Hunda Haqi</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <div id="view-performance" class="page-view">
+            <div class="panel">
+                <h2 class="panel-title">🎯 Hordoffii Galma fi Raawwii Hojjettootaa (Sales Performance)</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Maqaa Hojjetaa</th>
+                                <th>Target (ETB)</th>
+                                <th>Gali Maddisiise (ETB)</th>
+                                <th>Hafee ykn Caale (ETB)</th>
+                                <th>Raawwii (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="performance-table-rows"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -285,7 +288,7 @@
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                             <div class="form-group">
                                 <label>Gosa Miidiyaa (Media Type)</label>
-                                <select id="calc-media-type">
+                                <select id="calc-media-type" onchange="toggleYoutubeField()">
                                     <option value="FM Radio">FM Radio</option>
                                     <option value="AM Radio">AM Radio</option>
                                     <option value="FM & AM Link">FM & AM Link</option>
@@ -294,8 +297,13 @@
                             </div>
                             <div class="form-group">
                                 <label>Maqaa Channel</label>
-                                <input type="text" id="calc-channel" placeholder="Fkn, Yabelo FM 97.4" value="Yabelo FM 97.4">
+                                <input type="text" id="calc-channel" placeholder="Fkn, OBN TV HD" value="OBN TV HD">
                             </div>
+                        </div>
+
+                        <div class="form-group" id="section-youtube" style="display:none;">
+                            <label style="color:var(--obn-red);">Gatii Youtube Fixed (ETB)</label>
+                            <input type="number" id="calc-youtube-fixed" value="0" min="0">
                         </div>
 
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
@@ -356,21 +364,12 @@
                         <hr style="border: 0.5px solid #333; margin:10px 0;">
                         <div class="calc-row"><span>Airtime Base Cost:</span><span id="out-base">ETB 0.00</span></div>
                         <div class="calc-row"><span>Production Cost:</span><span id="out-prod">ETB 0.00</span></div>
+                        <div class="calc-row" id="out-row-youtube" style="display:none; color:#ff8888;"><span>Youtube Fixed Cost:</span><span id="out-youtube">ETB 0.00</span></div>
                         <div class="calc-row"><span>Sub-Total (Gross):</span><span id="out-sub">ETB 0.00</span></div>
                         <div class="calc-row"><span>Government VAT (15%):</span><span id="out-vat">ETB 0.00</span></div>
                         <div class="calc-row total-row"><span>Grand Total Cost:</span><span id="out-total">ETB 0.00</span></div>
                     </div>
-                    <button class="btn" style="margin-top:20px; background-color: var(--obn-red);" onclick="printQuotation()">🖨️ Print Quotation</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-about" class="page-view">
-            <div class="panel">
-                <h2 class="panel-title">Waa'ee Sirna Kanaa</h2>
-                <div class="about-text">
-                    <p><strong>OBN Ad Transmission Management System (v3.8)</strong> responsive fluid UI hundaafuu of-sirreessu qabu dha.</p>
-                    <p>Developed by: <strong>Qajeelaa H.</strong></p>
+                    <button class="btn" style="margin-top:20px; background-color: var(--obn-red);" onclick="window.print()">🖨️ Print Quotation</button>
                 </div>
             </div>
         </div>
@@ -386,19 +385,22 @@
                     <p style="font-size: 12px; opacity: 0.85;">© 2026 Oromia Broadcasting Network.</p>
                 </div>
             </div>
-            <div class="footer-center"><p>📞 Contact: <strong>0910166955</strong></p></div>
             <div class="footer-right"><p>Developed by: <strong>Qajeelaa H.</strong></p></div>
         </div>
     </footer>
 
     <script>
+        // Data Structures
         let OBN_DATABASE = JSON.parse(localStorage.getItem('obn_enterprise_logs')) || [];
+        let OBN_STAFF = JSON.parse(localStorage.getItem('obn_staff_list')) || [
+            { name: "Qajeelaa Hambisaa", target: 1000000 },
+            { name: "Urgeessaa Qana'aa", target: 800000 },
+            { name: "Obsinaan Bantii", target: 750000 }
+        ];
         let IS_AUTHENTICATED = sessionStorage.getItem('obn_session_active') === 'true';
 
-        // FIXED MOBILE TOGGLE LOGIC
         function toggleMenu() {
-            const nav = document.getElementById("system-nav");
-            nav.classList.toggle("nav-active");
+            document.getElementById("system-nav").classList.toggle("nav-active");
         }
 
         function loginSystem(event) {
@@ -419,26 +421,15 @@
             checkAuthRouting();
         }
 
-        // CONTROL VISIBILITY BASED ON PLATFORM WIDTH
         function checkAuthRouting() {
             const nav = document.getElementById("system-nav");
             const burger = document.getElementById("menu-toggle-btn");
-            
             if(IS_AUTHENTICATED) { 
-                if (window.innerWidth <= 768) {
-                    burger.style.display = "flex";
-                    // Don't force nav.style.display = "none" directly if it has active class
-                    if(!nav.classList.contains("nav-active")) {
-                        nav.style.display = "none";
-                    }
-                } else {
-                    burger.style.display = "none";
-                    nav.style.display = "flex";
-                }
+                if (window.innerWidth <= 768) { burger.style.display = "flex"; nav.style.display = "none"; }
+                else { burger.style.display = "none"; nav.style.display = "flex"; }
+                updateStaffDropdown();
             } else { 
-                burger.style.display = "none";
-                nav.style.display = "none"; 
-                switchView('login'); 
+                burger.style.display = "none"; nav.style.display = "none"; switchView('login'); 
             }
         }
 
@@ -460,15 +451,56 @@
             const activeNavBtn = document.getElementById(`nav-${viewName}`);
             if(activeNavBtn) activeNavBtn.classList.add('active');
 
-            // Bilbila irratti link erga cuqaasamee booda menu akka huffisuuf
             if (window.innerWidth <= 768) {
-                const nav = document.getElementById("system-nav");
-                nav.classList.remove("nav-active");
-                nav.style.display = "none";
+                document.getElementById("system-nav").classList.remove("nav-active");
+                document.getElementById("system-nav").style.display = "none";
             }
 
             if(viewName === 'dashboard') updateDashboardUI();
+            if(viewName === 'admin') { updateStaffDropdown(); updateAdminStaffTable(); }
+            if(viewName === 'performance') updatePerformanceUI();
             if(viewName === 'calculator') calculateMediaCost();
+        }
+
+        // Dropdown menu for selecting staff
+        function updateStaffDropdown() {
+            const select = document.getElementById("ad-specialist-select");
+            if(!select) return;
+            select.innerHTML = '<option value="">-- Hojjetaa Filadhu --</option>';
+            OBN_STAFF.forEach(staff => {
+                const opt = document.createElement("option");
+                opt.value = staff.name;
+                opt.innerText = staff.name;
+                select.appendChild(opt);
+            });
+        }
+
+        // Admin panel staff overview list
+        function updateAdminStaffTable() {
+            const tbody = document.getElementById("admin-staff-table-rows");
+            tbody.innerHTML = "";
+            OBN_STAFF.forEach(staff => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${escapeHtml(staff.name)}</td><td><strong>${parseFloat(staff.target).toLocaleString()} ETB</strong></td>`;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Register New Specialist
+        function processSpecialistForm(event) {
+            event.preventDefault();
+            const name = document.getElementById("spec-name").value.trim();
+            const target = parseFloat(document.getElementById("spec-target").value) || 0;
+            
+            if(OBN_STAFF.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+                alert("Hojjetaan kun duraan galmaayeera!"); return;
+            }
+            OBN_STAFF.push({ name, target });
+            localStorage.setItem('obn_staff_list', JSON.stringify(OBN_STAFF));
+            document.getElementById("admin-specialist-form").reset();
+            updateStaffDropdown();
+            updateAdminStaffTable();
+            alert("Hojjetaan haaraan milkiin galmeeffameera!");
         }
 
         function updateDashboardUI() {
@@ -488,6 +520,7 @@
                 row.innerHTML = `
                     <td><strong>${escapeHtml(ad.id)}</strong></td>
                     <td>${escapeHtml(ad.client)}</td>
+                    <td>👤 ${escapeHtml(ad.specialist || "Al-idilee")}</td>
                     <td>${escapeHtml(ad.time)}</td>
                     <td><strong>ETB ${parseFloat(ad.value).toLocaleString()}</strong></td>
                     <td><span class="badge ${badgeClass}">${badgeText}</span></td>
@@ -506,6 +539,7 @@
             const record = {
                 id: document.getElementById("ad-id").value.trim(),
                 client: document.getElementById("client-name").value.trim(),
+                specialist: document.getElementById("ad-specialist-select").value,
                 time: document.getElementById("air-time").value.trim(),
                 value: document.getElementById("ad-value").value,
                 status: document.getElementById("ad-status").value
@@ -513,8 +547,65 @@
             OBN_DATABASE.push(record);
             localStorage.setItem('obn_enterprise_logs', JSON.stringify(OBN_DATABASE));
             document.getElementById("admin-entry-form").reset();
-            alert("Beeksifni sirriitti galmeeffameera!");
+            alert("Beeksifni hordoffii sirriitti galmeeffameera!");
             switchView('dashboard');
+        }
+
+        // PERFORMANCE METRICS CALCULATOR ENGINE
+        function updatePerformanceUI() {
+            const tbody = document.getElementById("performance-table-rows");
+            tbody.innerHTML = "";
+
+            OBN_STAFF.forEach(staff => {
+                // Calculate total revenue generated by this specfic staff member
+                let revenueGained = OBN_DATABASE
+                    .filter(ad => ad.specialist === staff.name && ad.status === "Aired")
+                    .reduce((sum, ad) => sum + parseFloat(ad.value || 0), 0);
+
+                let target = staff.target || 1; 
+                let variance = revenueGained - target;
+                let percentage = (revenueGained / target) * 100;
+                
+                let varianceText = variance >= 0 
+                    ? `<span style="color:#137333; font-weight:700;">+${variance.toLocaleString()}</span>` 
+                    : `<span style="color:var(--obn-red); font-weight:700;">${variance.toLocaleString()}</span>`;
+
+                let progressClass = percentage < 50 ? 'progress-bar low' : 'progress-bar';
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>👤 ${escapeHtml(staff.name)}</strong></td>
+                    <td>ETB ${target.toLocaleString()}</td>
+                    <td><strong>ETB ${revenueGained.toLocaleString()}</strong></td>
+                    <td>${varianceText}</td>
+                    <td>
+                        <div><strong>${percentage.toFixed(1)}%</strong></div>
+                        <div class="progress-container">
+                            <div class="${progressClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Quotation Tools
+        function toggleYoutubeField() {
+            const mediaType = document.getElementById("calc-media-type").value;
+            const ytSection = document.getElementById("section-youtube");
+            const ytRow = document.getElementById("out-row-youtube");
+            const channelInput = document.getElementById("calc-channel");
+
+            if(mediaType === "TV") {
+                ytSection.style.display = "block"; ytRow.style.display = "flex"; channelInput.value = "OBN TV HD";
+            } else {
+                ytSection.style.display = "none"; ytRow.style.display = "none";
+                document.getElementById("calc-youtube-fixed").value = "0";
+                if(mediaType === "FM Radio") channelInput.value = "Yabelo FM 97.4";
+                else if(mediaType === "AM Radio") channelInput.value = "OBN AM Radio";
+                else channelInput.value = "FM & AM Linked Channel";
+            }
+            calculateMediaCost();
         }
 
         function toggleCalculatorFields() {
@@ -534,13 +625,11 @@
             const channelName = document.getElementById("calc-channel").value;
             const progType = document.getElementById("calc-prog-type").value;
             const frequency = parseFloat(document.getElementById("calc-frequency").value) || 1;
-
             let baseCost = 0; let prodCost = 0; let durationText = "";
 
             if(progType === "Beeksisa") {
                 const seconds = parseFloat(document.getElementById("calc-seconds").value) || 0;
                 const rateSec = parseFloat(document.getElementById("calc-rate-sec").value) || 0;
-                
                 baseCost = seconds * rateSec * frequency; 
                 prodCost = parseFloat(document.getElementById("calc-prod-fixed").value) || 0; 
                 durationText = `${seconds} Sekoondii`;
@@ -548,13 +637,13 @@
                 const minutes = parseFloat(document.getElementById("calc-minutes").value) || 0;
                 const rateMin = parseFloat(document.getElementById("calc-rate-min").value) || 0;
                 const prodMin = parseFloat(document.getElementById("calc-prod-min").value) || 0;
-                
                 baseCost = minutes * rateMin * frequency;
                 prodCost = minutes * prodMin * frequency; 
                 durationText = `${minutes} Daqiiqaa`;
             }
 
-            let subTotal = baseCost + prodCost;
+            let ytCost = mediaType === "TV" ? (parseFloat(document.getElementById("calc-youtube-fixed").value) || 0) : 0;
+            let subTotal = baseCost + prodCost + ytCost;
             let vatAmount = subTotal * 0.15; 
             let grandTotal = subTotal + vatAmount;
 
@@ -565,28 +654,29 @@
             document.getElementById("out-freq").innerText = frequency + " Times";
             document.getElementById("out-base").innerText = "ETB " + baseCost.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById("out-prod").innerText = "ETB " + prodCost.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById("out-youtube").innerText = "ETB " + ytCost.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById("out-sub").innerText = "ETB " + subTotal.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById("out-vat").innerText = "ETB " + vatAmount.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById("out-total").innerText = "ETB " + grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2});
         }
 
-        function printQuotation() { window.print(); }
-
         function exportToExcel() {
             if (OBN_DATABASE.length === 0) { alert("Kuusaan data duwwaa dha!"); return; }
             const formattedRows = OBN_DATABASE.map(ad => ({
-                "Ad ID": ad.id, "Maamiila (Client)": ad.client, "Sa'aatii Tamsaasaa": ad.time, "Kaffaltii (ETB)": parseFloat(ad.value), "Status": ad.status
+                "Ad ID": ad.id, "Maamiila (Client)": ad.client, "Hojjetaa (Sales Specialist)": ad.specialist || "Al-idilee", "Sa'aatii Tamsaasaa": ad.time, "Kaffaltii (ETB)": parseFloat(ad.value), "Status": ad.status
             }));
             const worksheet = XLSX.utils.json_to_sheet(formattedRows);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "OBN Ad Logs");
-            worksheet["!cols"] = [ { wch: 15 }, { wch: 30 }, { wch: 25 }, { wch: 15 }, { wch: 15 } ];
-            XLSX.writeFile(workbook, `OBN_Official_Ad_Report.xlsx`);
+            worksheet["!cols"] = [ { wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 15 } ];
+            XLSX.writeFile(workbook, `OBN_Sales_Ad_Report.xlsx`);
         }
 
         function clearSystemData() {
-            if(confirm("Ragaalee hunda kuusaa irraa guutummaatti haquuf mirkaneessi?")) {
-                localStorage.removeItem('obn_enterprise_logs'); OBN_DATABASE = []; updateDashboardUI();
+            if(confirm("Ragaalee hunda (Logs fi Hojjettoota) kuusaa irraa guutummaatti haquuf mirkaneessi?")) {
+                localStorage.removeItem('obn_enterprise_logs');
+                localStorage.removeItem('obn_staff_list');
+                OBN_DATABASE = []; OBN_STAFF = []; updateDashboardUI(); updateAdminStaffTable(); updateStaffDropdown();
             }
         }
 
@@ -594,7 +684,6 @@
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        // Boot system control setup
         checkAuthRouting();
     </script>
 </body>
