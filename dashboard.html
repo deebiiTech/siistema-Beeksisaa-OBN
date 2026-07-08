@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBN Ad Transmission Management System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --obn-red: #cc0000;
+            --obn-black: #111111;
+            --obn-white: #ffffff;
+            --obn-gray: #f4f4f4;
+            --border: #e0e0e0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--obn-gray); color: var(--obn-black); display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* ----- OFFICIAL HEADER ----- */
+        header {
+            background-color: var(--obn-red); color: var(--obn-white); padding: 15px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 5px solid var(--obn-black); box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .header-logo-area { display: flex; align-items: center; gap: 15px; }
+        .obn-logo-header {
+            width: 65px; height: 65px; background-color: var(--obn-white);
+            border: 2px solid var(--obn-black); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+        .obn-logo-header img { width: 90%; height: 90%; object-fit: contain; }
+        .header-title h1 { font-size: 22px; font-weight: 800; text-transform: uppercase; }
+        .header-title p { font-size: 12px; color: rgba(255, 255, 255, 0.9); }
+        
+        /* Navigation Links */
+        nav { display: none; gap: 12px; flex-wrap: wrap; }
+        nav button {
+            background: var(--obn-black); color: var(--obn-white); border: 1px solid var(--obn-white);
+            padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 11px;
+        }
+        nav button:hover, nav button.active { background-color: var(--obn-white); color: var(--obn-red); }
+
+        /* ----- MAIN CONTENT ROUTER ----- */
+        main { flex: 1; padding: 30px 40px; max-width: 1400px; width: 100%; margin: 0 auto; }
+        .page-view { display: none; }
+        .page-view.active-view { display: block; }
+
+        /* ----- LOGIN INTERFACE ----- */
+        .login-wrapper { max-width: 400px; margin: 80px auto; background: var(--obn-white); padding: 30px; border-radius: 6px; border-top: 5px solid var(--obn-red); box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        .login-wrapper h2 { margin-bottom: 20px; font-size: 20px; text-transform: uppercase; color: var(--obn-black); }
+        
+        /* ----- PANELS ----- */
+        .panel { background: var(--obn-white); border-radius: 6px; border-top: 4px solid var(--obn-black); box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 25px; }
+        .panel-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid var(--obn-gray); padding-bottom: 10px; text-transform: uppercase; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #333; }
+        input, select, textarea { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; color: var(--obn-black); }
+        input:focus, select:focus { outline: none; border-color: var(--obn-red); }
+
+        /* Buttons */
+        .btn { background-color: var(--obn-black); color: var(--obn-white); border: none; padding: 12px 20px; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.2s; }
+        .btn:hover { background-color: var(--obn-red); }
+        .btn-excel { background-color: #111; width: auto; margin-bottom: 15px; }
+        .btn-logout { background-color: #333 !important; }
+
+        /* KPI Cards */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--obn-white); padding: 20px; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid var(--obn-black); }
+        .stat-card.red-border { border-bottom-color: var(--obn-red); }
+        .stat-card h3 { font-size: 12px; color: #666; text-transform: uppercase; }
+        .stat-card .val { font-size: 26px; font-weight: 800; margin-top: 5px; }
+
+        /* Tables */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; background: var(--obn-white); }
+        th, td { padding: 14px; font-size: 14px; border-bottom: 1px solid var(--border); }
+        th { background-color: var(--obn-black); color: var(--obn-white); font-size: 12px; text-transform: uppercase; }
+        tr:hover { background-color: var(--obn-gray); }
+        
+        .badge { padding: 5px 10px; border-radius: 2px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .badge.aired { background-color: #e6f4ea; color: #137333; border: 1px solid #137333; }
+        .badge.missed { background-color: #fce8e6; color: #c5221f; border: 1px solid #c5221f; }
+
+        /* Calculator Output Panel */
+        .calc-result-box { background-color: var(--obn-black); color: var(--obn-white); padding: 20px; border-radius: 4px; margin-top: 20px; }
+        .calc-result-box h3 { border-bottom: 1px dashed #444; padding-bottom: 10px; margin-bottom: 10px; text-transform: uppercase; font-size: 14px; color: #aaa; }
+        .calc-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+        .calc-row.total-row { font-size: 20px; font-weight: 800; border-top: 2px solid var(--obn-red); padding-top: 10px; margin-top: 10px; color: var(--obn-white); }
+
+        /* ----- OFFICIAL FOOTER ----- */
+        footer { background-color: var(--obn-red); color: var(--obn-white); padding: 25px 40px; border-top: 5px solid var(--obn-black); margin-top: auto; }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .footer-left { display: flex; align-items: center; gap: 15px; }
+        .obn-logo-footer { width: 50px; height: 50px; background-color: var(--obn-white); border-radius: 50%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .obn-logo-footer img { width: 90%; height: 90%; object-fit: contain; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-logo-area">
+            <div class="obn-logo-header">
+                <img src="obn-logo.jfif" alt="OBN Logo"> 
+            </div>
+            <div class="header-title">
+                <h1>Oromia Broadcasting Network</h1>
+                <p>Ad Transmission Enterprise Management System</p>
+            </div>
+        </div>
+        <nav id="system-nav">
+            <button onclick="switchView('dashboard')" id="nav-dashboard">📊 Dashboard</button>
+            <button onclick="switchView('admin')" id="nav-admin">🛠️ Admin Panel</button>
+            <button onclick="switchView('calculator')" id="nav-calculator">🧮 Tilmaama Gatii (Calculator)</button>
+            <button onclick="switchView('about')" id="nav-about">ℹ️ About System</button>
+            <button onclick="logoutSystem()" class="btn-logout">🚪 Logout</button>
+        </nav>
+    </header>
+
+    <main>
+        
+        <div id="view-login" class="page-view active-view">
+            <div class="login-wrapper">
+                <div style="width:70px; height:70px; background:#f4f4f4; border-radius:50%; margin:0 auto 15px auto; display:flex; align-items:center; justify-content:center;">
+                    <img src="obn-logo.jfif" style="width:80%; object-fit:contain;">
+                </div>
+                <h2>OBN Account Login</h2>
+                <form onsubmit="loginSystem(event)">
+                    <div class="form-group" style="text-align:left;">
+                        <label>Username</label>
+                        <input type="text" id="login-user" value="admin" required>
+                    </div>
+                    <div class="form-group" style="text-align:left;">
+                        <label>Password</label>
+                        <input type="password" id="login-pass" value="admin123" required>
+                    </div>
+                    <button type="submit" class="btn" style="margin-top:10px;">🔒 Gena (Login)</button>
+                </form>
+                <p style="font-size:11px; margin-top:15px; color:#666;">Default: admin / admin123</p>
+            </div>
+        </div>
+
+        <div id="view-dashboard" class="page-view">
+            <div class="stats-row">
+                <div class="stat-card"><h3 style="color:#111;">Beeksisa Hunda</h3><div class="val" id="kpi-total">0</div></div>
+                <div class="stat-card" style="border-bottom-color:#137333;"><h3>Kanneen Tamsaa'an</h3><div class="val" style="color:#137333;" id="kpi-aired">0</div></div>
+                <div class="stat-card red-border"><h3>Kanneen Citan</h3><div class="val" style="color:var(--obn-red);" id="kpi-missed">0</div></div>
+                <div class="stat-card"><h3>Galii Guutuu</h3><div class="val" id="kpi-revenue">ETB 0</div></div>
+            </div>
+
+            <div class="panel">
+                <h2 class="panel-title">Tarreeffama Hordoffii Beeksisaa (Live Transmissions Log)</h2>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-excel" onclick="exportToExcel()">📊 Gara Excel tti Download Godhi</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ad ID</th>
+                                <th>Maamiila (Client)</th>
+                                <th>Sa'aatii Tamsaasaa</th>
+                                <th>Kaffaltii</th>
+                                <th>Haala Hordoffii</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-table-rows"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-admin" class="page-view">
+            <div class="panel">
+                <h2 class="panel-title">Simannaa Haaraa Galmeessuu (Ad Registration Desk)</h2>
+                <form id="admin-entry-form" onsubmit="processForm(event)">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px; margin-bottom:20px;">
+                        <div class="form-group">
+                            <label>Ad ID / Lakk. Galmee</label>
+                            <input type="text" id="ad-id" placeholder="Fkn, OBN-2026-88" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Maqaa Maamiilaa (Client Name)</label>
+                            <input type="text" id="client-name" placeholder="Fkn, Awash International Bank" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sa'aatii Tamsaasaa (Air Time Slot)</label>
+                            <input type="text" id="air-time" placeholder="Fkn, 01:00 PM Oduu Booda" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Kaffaltii Beeksisaa (Value in ETB)</label>
+                            <input type="number" id="ad-value" placeholder="Fkn, 65000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Haala Tamsaasaa</label>
+                            <select id="ad-status">
+                                <option value="Aired">🟢 AIRED PERFECTLY</option>
+                                <option value="Missed">🔴 MISSED</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:15px;">
+                        <button type="submit" class="btn" style="width:auto; padding:12px 35px;">💾 Galmeessi</button>
+                        <button type="button" class="btn" style="width:auto; background:#333;" onclick="clearSystemData()">🗑️ Data Haqi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="view-calculator" class="page-view">
+            <div class="grid-container" style="display: grid; grid-template-columns: 1fr 1fr; gap:30px;">
+                <div class="panel">
+                    <h2 class="panel-title">🧮 Shallaggii Gatii & Quotation Engine</h2>
+                    <form id="quotation-form" oninput="calculateMediaCost()">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                            <div class="form-group">
+                                <label>Gosa Miidiyaa (Media Type)</label>
+                                <select id="calc-media-type">
+                                    <option value="FM Radio">FM Radio</option>
+                                    <option value="AM Radio">AM Radio</option>
+                                    <option value="FM & AM Link">FM & AM Link</option>
+                                    <option value="TV">Television (TV)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Maqaa Channel (Channel Name)</label>
+                                <input type="text" id="calc-channel" placeholder="Fkn, Yabelo FM 97.4" value="Yabelo FM 97.4">
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                            <div class="form-group">
+                                <label>Gosa Sagantaa (Program Type)</label>
+                                <select id="calc-prog-type" onchange="toggleCalculatorFields()">
+                                    <option value="Beeksisa">Beeksisa (Commercial Ad)</option>
+                                    <option value="Yeroo Qilleensaa">Yeroo Qilleensaa (Air Time)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Baay'ina Sagantaa (Frequency/Times)</label>
+                                <input type="number" id="calc-frequency" value="1" min="1">
+                            </div>
+                        </div>
+
+                        <div id="section-beeksisa">
+                            <div class="form-group">
+                                <label>Dheerina Sekoondii (Total Seconds)</label>
+                                <input type="number" id="calc-seconds" value="30" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Gatii Sekoondii 1 (Rate per Second - ETB)</label>
+                                <input type="number" id="calc-rate-sec" value="250" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Gatii Production Guutuu (Fixed Production Cost - ETB)</label>
+                                <input type="number" id="calc-prod-fixed" value="5000" min="0">
+                                <p style="font-size:11px; color:var(--obn-red); margin-top:3px;">* Yaadannoo: Fixed cost dha, dachaadhaan hin baay'atu.</p>
+                            </div>
+                        </div>
+
+                        <div id="section-airtime" style="display:none;">
+                            <div class="form-group">
+                                <label>Dheerina Daqiiqaa (Total Minutes)</label>
+                                <input type="number" id="calc-minutes" value="15" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Gatii Daqiiqaa 1 (Rate per Minute - ETB)</label>
+                                <input type="number" id="calc-rate-min" value="3000" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Gatii Production Daqiiqaa 1 (Varies per Minute - ETB)</label>
+                                <input type="number" id="calc-prod-min" value="800" min="0">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="panel" style="border-top-color: var(--obn-red);">
+                    <h2 class="panel-title">📑 Waraqaa Tilmaama Gatii (Official Quotation)</h2>
+                    <div class="calc-result-box">
+                        <h3>OBN Official Invoice Estimate</h3>
+                        <div class="calc-row"><span>Media Type:</span><span id="out-media">-</span></div>
+                        <div class="calc-row"><span>Channel Name:</span><span id="out-channel">-</span></div>
+                        <div class="calc-row"><span>Program Type:</span><span id="out-prog">-</span></div>
+                        <div class="calc-row"><span>Duration:</span><span id="out-qty">-</span></div>
+                        <div class="calc-row"><span>Baay'ina Sagantaa (Frequency):</span><span id="out-freq">-</span></div>
+                        <hr style="border: 0.5px solid #333; margin:10px 0;">
+                        <div class="calc-row"><span>Airtime Base Cost:</span><span id="out-base">ETB 0.00</span></div>
+                        <div class="calc-row"><span>Production Cost:</span><span id="out-prod">ETB 0.00</span></div>
+                        <div class="calc-row"><span>Sub-Total (Pre-VAT):</span><span id="out-sub">ETB 0.00</span></div>
+                        <div class="calc-row"><span>Government VAT (15%):</span><span id="out-vat">ETB 0.00</span></div>
+                        <div class="calc-row total-row"><span>Grand Total Cost:</span><span id="out-total">ETB 0.00</span></div>
+                    </div>
+                    <button class="btn" style="margin-top:20px; background-color: var(--obn-red);" onclick="printQuotation()">🖨️ Tilmaama Kana Print Godhi</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-about" class="page-view">
+            <div class="panel">
+                <h2 class="panel-title">Waa'ee Sirna Kanaa</h2>
+                <div class="about-text">
+                    <p><strong>OBN Ad Transmission Management System (v3.3)</strong> sirna ammayyaa'aa deeskii simannaafi qophii beeksisaa keessatti tamsaasa hordofuu fi tilmaama gatii sirrii ta'e herreguuf qophaa'e dha.</p>
+                    <p>Developed by: <strong>Qajeelaa H.</strong></p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="obn-logo-footer"><img src="obn-logo.jfif" alt="OBN Logo"></div>
+                <div>
+                    <p style="font-weight: 700; font-size: 14px; text-transform: uppercase;">OBN Ad-Reception Enterprise Solution</p>
+                    <p style="font-size: 12px; opacity: 0.85;">© 2026 Oromia Broadcasting Network. All rights reserved.</p>
+                </div>
+            </div>
+            <div class="footer-center"><p>📞 Contact: <strong>0910166955</strong></p></div>
+            <div class="footer-right"><p>Developed by: <strong>Qajeelaa H.</strong></p></div>
+        </div>
+    </footer>
+
+    <script>
+        let OBN_DATABASE = JSON.parse(localStorage.getItem('obn_enterprise_logs')) || [];
+        let IS_AUTHENTICATED = sessionStorage.getItem('obn_session_active') === 'true';
+
+        function loginSystem(event) {
+            event.preventDefault();
+            const user = document.getElementById("login-user").value.trim();
+            const pass = document.getElementById("login-pass").value.trim();
+            if(user === "admin" && pass === "admin123") {
+                IS_AUTHENTICATED = true;
+                sessionStorage.setItem('obn_session_active', 'true');
+                checkAuthRouting();
+                switchView('dashboard');
+            } else { alert("Username ykn Password dogoggora!"); }
+        }
+
+        function logoutSystem() {
+            IS_AUTHENTICATED = false;
+            sessionStorage.removeItem('obn_session_active');
+            checkAuthRouting();
+        }
+
+        function checkAuthRouting() {
+            const nav = document.getElementById("system-nav");
+            if(IS_AUTHENTICATED) { nav.style.display = "flex"; } 
+            else { nav.style.display = "none"; switchView('login'); }
+        }
+
+        function switchView(viewName) {
+            document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active-view'));
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+
+            if(!IS_AUTHENTICATED) { document.getElementById('view-login').classList.add('active-view'); return; }
+
+            document.getElementById(`view-${viewName}`).classList.add('active-view');
+            const activeNavBtn = document.getElementById(`nav-${viewName}`);
+            if(activeNavBtn) activeNavBtn.classList.add('active');
+
+            if(viewName === 'dashboard') updateDashboardUI();
+            if(viewName === 'calculator') calculateMediaCost();
+        }
+
+        function updateDashboardUI() {
+            const tableBody = document.getElementById("dashboard-table-rows");
+            tableBody.innerHTML = "";
+            let airedCount = 0; let missedCount = 0; let totalRevenue = 0;
+
+            OBN_DATABASE.forEach(ad => {
+                const row = document.createElement("tr");
+                const badgeClass = ad.status === "Aired" ? "aired" : "missed";
+                const badgeText = ad.status === "Aired" ? "🟢 Aired" : "🔴 Missed";
+                
+                if(ad.status === "Aired") airedCount++;
+                if(ad.status === "Missed") missedCount++;
+                totalRevenue += parseFloat(ad.value);
+
+                row.innerHTML = `
+                    <td><strong>${escapeHtml(ad.id)}</strong></td>
+                    <td>${escapeHtml(ad.client)}</td>
+                    <td>${escapeHtml(ad.time)}</td>
+                    <td><strong>ETB ${parseFloat(ad.value).toLocaleString()}</strong></td>
+                    <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById("kpi-total").innerText = OBN_DATABASE.length;
+            document.getElementById("kpi-aired").innerText = airedCount;
+            document.getElementById("kpi-missed").innerText = missedCount;
+            document.getElementById("kpi-revenue").innerText = "ETB " + totalRevenue.toLocaleString();
+        }
+
+        function processForm(event) {
+            event.preventDefault();
+            const record = {
+                id: document.getElementById("ad-id").value.trim(),
+                client: document.getElementById("client-name").value.trim(),
+                time: document.getElementById("air-time").value.trim(),
+                value: document.getElementById("ad-value").value,
+                status: document.getElementById("ad-status").value
+            };
+            OBN_DATABASE.push(record);
+            localStorage.setItem('obn_enterprise_logs', JSON.stringify(OBN_DATABASE));
+            document.getElementById("admin-entry-form").reset();
+            alert("Beeksifni sirriitti galmeeffameera!");
+            switchView('dashboard');
+        }
+
+        function toggleCalculatorFields() {
+            const type = document.getElementById("calc-prog-type").value;
+            if(type === "Beeksisa") {
+                document.getElementById("section-beeksisa").style.display = "block";
+                document.getElementById("section-airtime").style.display = "none";
+            } else {
+                document.getElementById("section-beeksisa").style.display = "none";
+                document.getElementById("section-airtime").style.display = "block";
+            }
+            calculateMediaCost();
+        }
+
+        // DYNAMIC CALCULATION ENGINE WITH FREQUENCY (BAAY'INA SAGANTAA)
+        function calculateMediaCost() {
+            const mediaType = document.getElementById("calc-media-type").value;
+            const channelName = document.getElementById("calc-channel").value;
+            const progType = document.getElementById("calc-prog-type").value;
+            const frequency = parseFloat(document.getElementById("calc-frequency").value) || 1;
+
+            let baseCost = 0; let prodCost = 0; let durationText = "";
+
+            if(progType === "Beeksisa") {
+                const seconds = parseFloat(document.getElementById("calc-seconds").value) || 0;
+                const rateSec = parseFloat(document.getElementById("calc-rate-sec").value) || 0;
+                
+                baseCost = seconds * rateSec * frequency; // Transmission cost multiplies with frequency
+                prodCost = parseFloat(document.getElementById("calc-prod-fixed").value) || 0; // Fixed Production Cost (No frequency multiplication)
+                durationText = `${seconds} Sekoondii`;
+            } else {
+                const minutes = parseFloat(document.getElementById("calc-minutes").value) || 0;
+                const rateMin = parseFloat(document.getElementById("calc-rate-min").value) || 0;
+                const prodMin = parseFloat(document.getElementById("calc-prod-min").value) || 0;
+                
+                baseCost = minutes * rateMin * frequency;
+                prodCost = minutes * prodMin * frequency; // Airtime production multiplies per slot/minute
+                durationText = `${minutes} Daqiiqaa`;
+            }
+
+            let subTotal = baseCost + prodCost;
+            let vatAmount = subTotal * 0.15; 
+            let grandTotal = subTotal + vatAmount;
+
+            // UI Display updates
+            document.getElementById("out-media").innerText = mediaType;
+            document.getElementById("out-channel").innerText = channelName || "-";
+            document.getElementById("out-prog").innerText = progType;
+            document.getElementById("out-qty").innerText = durationText;
+            document.getElementById("out-freq").innerText = frequency + " Immoo (Times)";
+            document.getElementById("out-base").innerText = "ETB " + baseCost.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById("out-prod").innerText = "ETB " + prodCost.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById("out-sub").innerText = "ETB " + subTotal.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById("out-vat").innerText = "ETB " + vatAmount.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById("out-total").innerText = "ETB " + grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2});
+        }
+
+        function printQuotation() { window.print(); }
+
+        function exportToExcel() {
+            if (OBN_DATABASE.length === 0) { alert("Kuusaan data duwwaa dha!"); return; }
+            const formattedRows = OBN_DATABASE.map(ad => ({
+                "Ad ID": ad.id, "Maamiila (Client)": ad.client, "Sa'aatii Tamsaasaa": ad.time, "Kaffaltii (ETB)": parseFloat(ad.value), "Status": ad.status
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(formattedRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "OBN Ad Logs");
+            worksheet["!cols"] = [ { wch: 15 }, { wch: 30 }, { wch: 25 }, { wch: 15 }, { wch: 15 } ];
+            XLSX.writeFile(workbook, `OBN_Official_Ad_Report.xlsx`);
+        }
+
+        function clearSystemData() {
+            if(confirm("Ragaalee hunda kuusaa irraa guutummaatti haquuf mirkaneessi?")) {
+                localStorage.removeItem('obn_enterprise_logs'); OBN_DATABASE = []; updateDashboardUI();
+            }
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        checkAuthRouting();
+    </script>
+</body>
+</html>
