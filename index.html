@@ -31,11 +31,11 @@
             display: flex; justify-content: center; align-items: center; overflow: hidden;
             flex-shrink: 0;
         }
-        .obn-logo-header img { width: 100%; height: 100%; object-fit: cover; }
+        .obn-logo-header img { width: 100%; height: auto; max-height: 100%; object-fit: contain; }
         .header-title h1 { font-size: 22px; font-weight: 800; text-transform: uppercase; }
         .header-title p { font-size: 12px; color: rgba(255, 255, 255, 0.9); }
         
-        /* Hamburger Icon */
+        /* Hamburger Icon Mobile-f */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -43,20 +43,19 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 5px;
+            padding: 10px;
+            z-index: 1001;
         }
         .hamburger span {
             display: block;
-            width: 28px;
+            width: 25px;
             height: 3px;
             background-color: var(--obn-white);
             border-radius: 2px;
-            transition: 0.3s;
         }
 
-        /* Navigation Links */
-        nav { display: none; gap: 12px; flex-wrap: wrap; }
-        nav.nav-active { display: flex; }
+        /* Navigation Links (Desktop) */
+        nav { display: flex; gap: 12px; flex-wrap: wrap; }
         nav button {
             background: var(--obn-black); color: var(--obn-white); border: 1px solid var(--obn-white);
             padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 11px;
@@ -119,19 +118,19 @@
         .footer-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .footer-left { display: flex; align-items: center; gap: 15px; }
         .obn-logo-footer { width: 50px; height: 50px; background-color: var(--obn-white); border-radius: 50%; display: flex; justify-content: center; align-items: center; overflow: hidden; flex-shrink: 0; }
-        .obn-logo-footer img { width: 100%; height: 100%; object-fit: cover; }
+        .obn-logo-footer img { width: 100%; height: auto; max-height: 100%; object-fit: contain; }
 
-        /* ==================== RESPONSIVE MEDIA QUERIES (MOBILE OPTIMIZATION) ==================== */
+        /* ==================== RESPONSIVE (MOBILE) ==================== */
         @media (max-width: 768px) {
-            header { padding: 15px 20px; flex-direction: row; justify-content: space-between; }
-            .header-title h1 { font-size: 16px; }
+            header { padding: 15px 20px; }
+            .header-title h1 { font-size: 15px; }
             .header-title p { font-size: 10px; }
             .obn-logo-header { width: 45px; height: 45px; }
 
             .hamburger { display: flex; }
 
             nav {
-                display: none;
+                display: none; /* Calqaba irratti dhokataadha */
                 flex-direction: column;
                 width: 100%;
                 position: absolute;
@@ -143,12 +142,14 @@
                 z-index: 1000;
                 gap: 8px;
             }
+            /* Luusni kun yoo itti dabalame qofa mul'ata */
+            nav.nav-active { display: flex !important; }
             nav button { width: 100%; text-align: left; padding: 12px; font-size: 12px; }
 
             main { padding: 15px 20px; }
             .stats-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .stat-card { padding: 15px; }
-            .stat-card .val { font-size: 20px; }
+            .stat-card .val { font-size: 18px; }
 
             .grid-container { grid-template-columns: 1fr; gap: 20px; }
 
@@ -171,7 +172,7 @@
             </div>
         </div>
         
-        <button class="hamburger" onclick="toggleMenu()" id="menu-toggle-btn" style="display: none;">
+        <button class="hamburger" onclick="toggleMenu()" id="menu-toggle-btn">
             <span></span>
             <span></span>
             <span></span>
@@ -189,24 +190,25 @@
     <main>
         
         <div id="view-login" class="page-view active-view">
-    <div class="login-wrapper">
-        <div style="width:70px; height:70px; background:#f4f4f4; border-radius:50%; margin:0 auto 15px auto; display:flex; align-items:center; justify-content:center; overflow:hidden; border: 1px solid #ccc;">
-            <img src="obn-logo.jfif" style="width:100%; height:auto; max-height:100%; object-fit:contain;">
-        </div>
-        <h2>OBN Account Login</h2>
-        <form onsubmit="loginSystem(event)">
-            <div class="form-group" style="text-align:left;">
-                <label>Username</label>
-                <input type="text" id="login-user" value="..." required>
+            <div class="login-wrapper">
+                <div style="width:70px; height:70px; background:#f4f4f4; border-radius:50%; margin:0 auto 15px auto; display:flex; align-items:center; justify-content:center; overflow:hidden; border: 1px solid #ccc;">
+                    <img src="obn-logo.jfif" style="width:100%; height:auto; max-height:100%; object-fit:contain;">
+                </div>
+                <h2>OBN Account Login</h2>
+                <form onsubmit="loginSystem(event)">
+                    <div class="form-group" style="text-align:left;">
+                        <label>Username</label>
+                        <input type="text" id="login-user" value="" required>
+                    </div>
+                    <div class="form-group" style="text-align:left;">
+                        <label>Password</label>
+                        <input type="password" id="login-pass" value="" required>
+                    </div>
+                    <button type="submit" class="btn" style="margin-top:10px;">🔒 Gena (Login)</button>
+                </form>
+                <p style="font-size:11px; margin-top:15px; color:#666;">Default: admin / admin123</p>
             </div>
-            <div class="form-group" style="text-align:left;">
-                <label>Password</label>
-                <input type="password" id="login-pass" value="..." required>
-            </div>
-            <button type="submit" class="btn" style="margin-top:10px;">🔒 Gena (Login)</button>
-        </form>
-        </div>
-</div>
+        </div
 
         <div id="view-dashboard" class="page-view">
             <div class="stats-row">
@@ -367,7 +369,7 @@
             <div class="panel">
                 <h2 class="panel-title">Waa'ee Sirna Kanaa</h2>
                 <div class="about-text">
-                    <p><strong>OBN Ad Transmission Management System (v3.6)</strong> responsive fluid UI hundaafuu of-sirreessu qabu dha.</p>
+                    <p><strong>OBN Ad Transmission Management System (v3.8)</strong> responsive fluid UI hundaafuu of-sirreessu qabu dha.</p>
                     <p>Developed by: <strong>Qajeelaa H.</strong></p>
                 </div>
             </div>
@@ -393,6 +395,7 @@
         let OBN_DATABASE = JSON.parse(localStorage.getItem('obn_enterprise_logs')) || [];
         let IS_AUTHENTICATED = sessionStorage.getItem('obn_session_active') === 'true';
 
+        // FIXED MOBILE TOGGLE LOGIC
         function toggleMenu() {
             const nav = document.getElementById("system-nav");
             nav.classList.toggle("nav-active");
@@ -416,13 +419,18 @@
             checkAuthRouting();
         }
 
+        // CONTROL VISIBILITY BASED ON PLATFORM WIDTH
         function checkAuthRouting() {
             const nav = document.getElementById("system-nav");
             const burger = document.getElementById("menu-toggle-btn");
+            
             if(IS_AUTHENTICATED) { 
                 if (window.innerWidth <= 768) {
                     burger.style.display = "flex";
-                    nav.style.display = "none"; 
+                    // Don't force nav.style.display = "none" directly if it has active class
+                    if(!nav.classList.contains("nav-active")) {
+                        nav.style.display = "none";
+                    }
                 } else {
                     burger.style.display = "none";
                     nav.style.display = "flex";
@@ -435,19 +443,10 @@
         }
 
         window.addEventListener('resize', () => {
-            if (IS_AUTHENTICATED) {
-                const nav = document.getElementById("system-nav");
-                const burger = document.getElementById("menu-toggle-btn");
-                if (window.innerWidth > 768) {
-                    nav.style.display = "flex";
-                    nav.classList.remove("nav-active");
-                    burger.style.display = "none";
-                } else {
-                    burger.style.display = "flex";
-                    if(!nav.classList.contains("nav-active")) {
-                        nav.style.display = "none";
-                    }
-                }
+            checkAuthRouting();
+            if (window.innerWidth > 768) {
+                document.getElementById("system-nav").classList.remove("nav-active");
+                document.getElementById("system-nav").style.display = "flex";
             }
         });
 
@@ -461,10 +460,11 @@
             const activeNavBtn = document.getElementById(`nav-${viewName}`);
             if(activeNavBtn) activeNavBtn.classList.add('active');
 
-            // Hide menu drawer on selection (Mobile view)
+            // Bilbila irratti link erga cuqaasamee booda menu akka huffisuuf
             if (window.innerWidth <= 768) {
-                document.getElementById("system-nav").style.display = "none";
-                document.getElementById("system-nav").classList.remove("nav-active");
+                const nav = document.getElementById("system-nav");
+                nav.classList.remove("nav-active");
+                nav.style.display = "none";
             }
 
             if(viewName === 'dashboard') updateDashboardUI();
@@ -594,6 +594,7 @@
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
+        // Boot system control setup
         checkAuthRouting();
     </script>
 </body>
